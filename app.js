@@ -20,15 +20,16 @@ const server = http.createServer((req, res) => {
       console.log(chunk);
       body.push(chunk);
     });
-    req.on('end', () => {
+    return req.on('end', () => {
       const parsedBody = Buffer.concat(body).toString();
       const message = parsedBody.split('=')[1];
       fs.writeFileSync('message.txt', message);
+      res.statusCode = 302;
+      res.setHeader('Location', '/');
+      return res.end();
     });
-    res.statusCode = 302;
-    res.setHeader('Location', '/');
-    return res.end();
   }
+  // 23 line 에 return 을 두지 않으면 34 line 이 실행돼서 오류 남.
   res.setHeader('Content-Type', 'text/html');
   res.write('<html lang="ko">');
   res.write('<head><title>My First Page</title></head>');
